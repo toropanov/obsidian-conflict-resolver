@@ -2,7 +2,7 @@
   "id": "conflict-resolver",
   "name": "Conflict Resolver",
   "version": "0.1.1",
-  "minAppVersion": "1.4.0",
+  "minAppVersion": "1.6.6",
   "description": "Finds sync-conflict copies and safely resolves duplicates in your vault.",
   "author": "Anton Toropanov",
   "isDesktopOnly": false
