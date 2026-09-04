@@ -4,6 +4,6 @@
   "version": "0.1.0",
   "minAppVersion": "1.4.0",
   "description": "Finds sync-conflict copies and safely resolves duplicates in your vault.",
-  "author": "Alexey Toropov",
+  "author": "Anton Toropanov",
   "isDesktopOnly": false
 }
