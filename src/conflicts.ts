@@ -5,22 +5,43 @@ export interface ConflictName {
   kind: ConflictKind;
 }
 
-// Covers macOS/Finder and cloud clients: "Note (2).md", "Note - conflicted copy.md",
-// and common Dropbox/OneDrive forms. Only the final filename is inspected.
-const PATTERNS: readonly { pattern: RegExp; kind: ConflictKind }[] = [
-  { pattern: /^(.*) \((\d+)\)(\.[^.]*)?$/u, kind: "numbered-copy" },
-  { pattern: /^(.*?)(?: \(| - )(?:conflicted copy|conflict|duplicate)(?: [^)]*)?\)?(\.[^.]*)?$/iu, kind: "cloud-conflict" },
-  { pattern: /^(.*?)(?: \(| - )?(?:conflicted copy|conflict)(?: [^)]*)?\)?(\.[^.]*)?$/iu, kind: "cloud-conflict" }
-];
-
 export function parseConflictName(name: string): ConflictName | null {
-  for (const { pattern, kind } of PATTERNS) {
-    const match = name.match(pattern);
-    if (!match?.[1]) continue;
-    const extension = match[3] ?? match[2] ?? "";
-    return { canonicalName: `${match[1].trim()}${extension}`, kind };
-  }
+  const { stem, extension } = splitExtension(name);
+
+  // Finder, macOS and several cloud clients: "Note (2).md".
+  const numbered = stem.match(/^(.*) \(\d+\)$/u);
+  if (numbered?.[1]) return conflict(numbered[1], extension, "numbered-copy");
+
+  // Google Drive for desktop: "Report_conf(1).xlsx".
+  const googleDrive = stem.match(/^(.*)_conf\(\d+\)$/iu);
+  if (googleDrive?.[1]) return conflict(googleDrive[1], extension, "cloud-conflict");
+
+  // Syncthing: "Note.sync-conflict-20260904-120000-DEVICEID.md".
+  const syncthing = stem.match(/^(.*)\.sync-conflict-\d{8}-\d{6}(?:-[a-z0-9]+)?$/iu);
+  if (syncthing?.[1]) return conflict(syncthing[1], extension, "cloud-conflict");
+
+  // Syncthing on case-insensitive filesystems: "Note.case-conflict-timestamp-device.md".
+  const syncthingCase = stem.match(/^(.*)\.case-conflict-[a-z0-9-]+$/iu);
+  if (syncthingCase?.[1]) return conflict(syncthingCase[1], extension, "cloud-conflict");
+
+  // Dropbox, Nextcloud and Resilio-style copies: "Note (Alice's conflicted copy 2026-09-04).md".
+  const conflictedCopy = stem.match(/^(.*?) \([^)]*conflicted copy[^)]*\)$/iu);
+  if (conflictedCopy?.[1]) return conflict(conflictedCopy[1], extension, "cloud-conflict");
+
+  // A conservative generic form used by some clients: "Note - conflict 2026-09-04.md".
+  const genericConflict = stem.match(/^(.*?) - (?:conflict|duplicate)(?: \d[\d -]*)?$/iu);
+  if (genericConflict?.[1]) return conflict(genericConflict[1], extension, "cloud-conflict");
   return null;
+}
+
+function splitExtension(name: string): { stem: string; extension: string } {
+  const index = name.lastIndexOf(".");
+  return index > 0 ? { stem: name.slice(0, index), extension: name.slice(index) } : { stem: name, extension: "" };
+}
+
+function conflict(stem: string, extension: string, kind: ConflictKind): ConflictName | null {
+  const canonicalName = `${stem.trim()}${extension}`;
+  return stem.trim() ? { canonicalName, kind } : null;
 }
 
 /**

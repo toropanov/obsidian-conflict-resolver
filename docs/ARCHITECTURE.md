@@ -2,7 +2,9 @@
 
 ## What is a conflict
 
-The scanner recognises a conflict copy only when its filename ends in a known sync-client suffix: Finder's ` (2)`, or a `conflict` / `conflicted copy` marker. It then looks for a sibling file with the unmodified name. A filename alone is never deleted; both files must exist.
+The scanner recognises a conflict copy only when its filename ends in a known sync-client suffix, then looks for a sibling file with the unmodified name. A filename alone is never deleted; both files must exist.
+
+Supported patterns are Finder/Yandex Disk-style ` (2)`, Google Drive for desktop `_conf(1)`, Syncthing `.sync-conflict-YYYYMMDD-HHMMSS-DEVICE`, Syncthing `.case-conflict-…`, and Dropbox/Nextcloud/Resilio-style `(... conflicted copy ...)`. A generic ` - conflict` / ` - duplicate` form is also recognised. Ambiguous names such as `document-laptop.md` are intentionally ignored.
 
 The initial release checks text files exposed through Obsidian's vault API. It intentionally does not inspect binary data, hidden plugin internals, or remote provider metadata. That keeps the result deterministic and works with Yandex Disk, iCloud, Dropbox, OneDrive, Syncthing, and manual copies.
 
