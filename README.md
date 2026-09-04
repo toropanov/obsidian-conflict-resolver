@@ -2,6 +2,13 @@
 
 An Obsidian plugin that finds sync-conflict file copies and helps resolve them safely, change by change.
 
+[![Obsidian Community Plugin](https://img.shields.io/badge/Obsidian-Community%20Plugin-7c3aed?logo=obsidian&logoColor=white)](https://community.obsidian.md/plugins/conflict-resolver)
+[![GitHub release](https://img.shields.io/github/v/release/toropanov/obsidian-conflict-resolver?display_name=tag&sort=semver)](https://github.com/toropanov/obsidian-conflict-resolver/releases)
+[![CI](https://github.com/toropanov/obsidian-conflict-resolver/actions/workflows/ci.yml/badge.svg)](https://github.com/toropanov/obsidian-conflict-resolver/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/toropanov/obsidian-conflict-resolver)](https://github.com/toropanov/obsidian-conflict-resolver/blob/main/LICENSE)
+
+**[Install from the Obsidian Community directory](https://community.obsidian.md/plugins/conflict-resolver)**
+
 It is designed for vaults synchronized through Yandex Disk, iCloud Drive, Dropbox, Google Drive for desktop, Syncthing, Nextcloud, Resilio Sync, and similar tools that create conflict copies.
 
 ## Supported conflict filenames
@@ -77,12 +84,12 @@ For differing files, Conflict Resolver calculates a local line-based diff. It gr
 
 ### Community plugins
 
-Once the plugin is listed in the Obsidian community plugins directory:
-
 1. Open **Settings → Community plugins**.
 2. Turn off Restricted mode if necessary.
 3. Search for **Conflict Resolver**.
 4. Install and enable it.
+
+You can also open the [Conflict Resolver listing](https://community.obsidian.md/plugins/conflict-resolver) and select **Add to Obsidian**.
 
 ### Manual installation
 
@@ -173,6 +180,7 @@ Obsidian downloads plugin files from GitHub Releases, not from the repository br
 
 - Minimum Obsidian version: `1.4.0`
 - Desktop and mobile compatible
+- Current published release: [`0.1.0`](https://github.com/toropanov/obsidian-conflict-resolver/releases/tag/0.1.0)
 
 ## License
 
