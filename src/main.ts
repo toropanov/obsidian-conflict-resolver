@@ -1,4 +1,5 @@
 import { App, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, normalizePath } from "obsidian";
+import type { SettingDefinitionItem } from "obsidian";
 import { ConflictKind, isCopyContainedInOriginal, parseConflictName } from "./conflicts";
 import { DiffHunk, applyCopyHunks, createHunks } from "./diff";
 
@@ -49,7 +50,7 @@ export default class ConflictResolverPlugin extends Plugin {
       // A non-empty conflict copy already fully present in the canonical file
       // cannot contribute unique text, so it is safe to remove automatically.
       if (this.settings.autoDeleteContainedCopies && isCopyContainedInOriginal(left, right)) {
-        await this.app.vault.delete(copy);
+        await this.app.fileManager.trashFile(copy);
         continue;
       }
       found.push({ original, copy, kind: parsed.kind, identical: left === right });
@@ -67,20 +68,20 @@ export default class ConflictResolverPlugin extends Plugin {
   async deleteIdentical(): Promise<void> {
     await this.scan();
     const safe = this.conflicts.filter((conflict) => conflict.identical);
-    for (const conflict of safe) await this.app.vault.delete(conflict.copy);
+    for (const conflict of safe) await this.app.fileManager.trashFile(conflict.copy);
     await this.scan();
     new Notice(safe.length ? `Deleted ${safe.length} identical conflict ${safe.length === 1 ? "copy" : "copies"}.` : "No identical conflict copies found.");
   }
 
   async keepOriginal(conflict: Conflict): Promise<void> {
-    await this.app.vault.delete(conflict.copy);
+    await this.app.fileManager.trashFile(conflict.copy);
     await this.scan();
   }
 
   async resolveHunks(conflict: Conflict, hunks: DiffHunk[], useCopy: ReadonlySet<number>): Promise<void> {
     const originalText = await this.app.vault.read(conflict.original);
     await this.app.vault.modify(conflict.original, applyCopyHunks(originalText, hunks, useCopy));
-    await this.app.vault.delete(conflict.copy);
+    await this.app.fileManager.trashFile(conflict.copy);
     await this.scan();
   }
 
@@ -116,6 +117,31 @@ export default class ConflictResolverPlugin extends Plugin {
 
 class ConflictResolverSettingTab extends PluginSettingTab {
   constructor(app: App, private readonly plugin: ConflictResolverPlugin) { super(app, plugin); }
+
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    return [
+      {
+        name: "Delete copies already contained in the original",
+        desc: "During scans, automatically delete a non-empty conflict copy when every non-empty line is already present in the original file in the same order.",
+        control: { type: "toggle", key: "autoDeleteContainedCopies" }
+      },
+      {
+        name: "Scan on startup",
+        desc: "Update the conflict counter when Obsidian starts.",
+        control: { type: "toggle", key: "scanOnStartup" }
+      }
+    ];
+  }
+
+  getControlValue(key: string): unknown {
+    if (key === "autoDeleteContainedCopies" || key === "scanOnStartup") return this.plugin.settings[key];
+    return undefined;
+  }
+
+  async setControlValue(key: string, value: unknown): Promise<void> {
+    if ((key !== "autoDeleteContainedCopies" && key !== "scanOnStartup") || typeof value !== "boolean") return;
+    await this.plugin.updateSettings({ ...this.plugin.settings, [key]: value });
+  }
 
   display(): void {
     const { containerEl } = this;
