@@ -1,6 +1,6 @@
 {
   "name": "obsidian-conflict-resolver",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An Obsidian plugin for safely resolving sync-conflict copies.",
   "private": true,
   "main": "main.js",
