@@ -3,6 +3,8 @@
 An Obsidian plugin that finds sync-conflict file copies and helps resolve them safely, change by change.
 
 [![Obsidian Community Plugin](https://img.shields.io/badge/Obsidian-Community%20Plugin-7c3aed?logo=obsidian&logoColor=white)](https://community.obsidian.md/plugins/conflict-resolver)
+[![Obsidian Community Health](https://img.shields.io/badge/Obsidian%20Community-Health%3A%20Excellent-2ea44f?logo=obsidian&logoColor=white)](https://community.obsidian.md/plugins/conflict-resolver#scorecard)
+[![Obsidian Community Review](https://img.shields.io/badge/Obsidian%20Community-Review%3A%20Passed-2ea44f?logo=obsidian&logoColor=white)](https://community.obsidian.md/plugins/conflict-resolver#scorecard)
 [![GitHub release](https://img.shields.io/github/v/release/toropanov/obsidian-conflict-resolver?display_name=tag&sort=semver)](https://github.com/toropanov/obsidian-conflict-resolver/releases)
 [![CI](https://github.com/toropanov/obsidian-conflict-resolver/actions/workflows/ci.yml/badge.svg)](https://github.com/toropanov/obsidian-conflict-resolver/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/toropanov/obsidian-conflict-resolver)](https://github.com/toropanov/obsidian-conflict-resolver/blob/main/LICENSE)
@@ -178,9 +180,9 @@ Obsidian downloads plugin files from GitHub Releases, not from the repository br
 
 ## Compatibility
 
-- Minimum Obsidian version: `1.4.0`
+- Minimum Obsidian version: `1.6.6`
 - Desktop and mobile compatible
-- Current published release: [`0.1.0`](https://github.com/toropanov/obsidian-conflict-resolver/releases/tag/0.1.0)
+- Current published release: [`0.1.2`](https://github.com/toropanov/obsidian-conflict-resolver/releases/tag/0.1.2)
 
 ## License
 
