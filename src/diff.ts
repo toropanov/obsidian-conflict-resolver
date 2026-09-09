@@ -71,7 +71,9 @@ export function createHunks(originalText: string, copyText: string): DiffHunk[] 
     const changed = left.kind !== "same" || right.kind !== "same";
     if (!changed) {
       active = null;
-      if (left.text) originalLine++;
+      // A matching empty line still occupies a position in the original.
+      // Skipping it shifts every later insertion up by one line.
+      originalLine++;
       continue;
     }
     if (!active) {

@@ -1,6 +1,7 @@
 import { App, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, normalizePath, setIcon } from "obsidian";
 import { ConflictKind, parseConflictName } from "./conflicts";
 import { DiffHunk, createHunks } from "./diff";
+import { shouldShowConflictButton } from "./ui";
 
 interface Conflict {
   original: TFile;
@@ -140,23 +141,23 @@ export default class ConflictResolverPlugin extends Plugin {
   private isIgnored(path: string): boolean { return this.settings.ignoredFolders.some((folder) => path === folder || path.startsWith(`${folder}/`)); }
 
   private mountFileExplorerButton(): void {
-    for (const leaf of this.app.workspace.getLeavesOfType("file-explorer")) {
-      const container = leaf.view.containerEl;
-      if (container.querySelector(".conflict-resolver-footer")) continue;
-      const footer = container.createDiv({ cls: "conflict-resolver-footer" });
-      const button = footer.createEl("button", { cls: "mod-cta", text: "Scan conflicts" });
-      button.addEventListener("click", () => void this.scanAndShow());
-    }
     this.updateFileExplorerButton();
   }
 
   private updateFileExplorerButton(): void {
-    for (const footer of Array.from(document.querySelectorAll<HTMLElement>(".conflict-resolver-footer"))) {
-      footer.toggleClass("is-hidden", this.conflicts.length === 0);
-    }
-    for (const button of Array.from(document.querySelectorAll<HTMLButtonElement>(".conflict-resolver-footer button"))) {
+    for (const leaf of this.app.workspace.getLeavesOfType("file-explorer")) {
+      const container = leaf.view.containerEl;
+      const existing = container.querySelector<HTMLElement>(".conflict-resolver-footer");
+      if (!shouldShowConflictButton(this.conflicts.length)) {
+        existing?.remove();
+        continue;
+      }
+      const footer = existing ?? container.createDiv({ cls: "conflict-resolver-footer" });
+      const button = footer.querySelector<HTMLButtonElement>("button")
+        ?? footer.createEl("button", { cls: "mod-cta" });
       button.setText(`Resolve conflicts (${this.conflicts.length})`);
       button.addClass("mod-cta");
+      button.onclick = () => void this.scanAndShow();
     }
   }
 }
