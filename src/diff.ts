@@ -17,6 +17,8 @@ export interface DiffHunk {
   copyLines: string[];
 }
 
+export type HunkResolution = "original" | "copy" | "both";
+
 /**
  * Produces a readable line diff using the longest-common-subsequence matrix.
  * It is deliberately local and dependency-free: vault text is never sent away.
@@ -86,12 +88,28 @@ export function createHunks(originalText: string, copyText: string): DiffHunk[] 
 }
 
 export function applyCopyHunks(originalText: string, hunks: DiffHunk[], useCopy: ReadonlySet<number>): string {
+  return applyHunkResolutions(originalText, hunks, new Map([...useCopy].map((index) => [index, "copy"] as const)));
+}
+
+/**
+ * Builds the exact text that will be written after the user's choices. This is
+ * also used for the preview, so the UI never promises a result it cannot save.
+ */
+export function applyHunkResolutions(
+  originalText: string,
+  hunks: DiffHunk[],
+  resolutions: ReadonlyMap<number, HunkResolution>
+): string {
   const lines = originalText.split("\n");
   // Apply bottom-up so replacements above do not invalidate lower offsets.
   for (let index = hunks.length - 1; index >= 0; index--) {
-    if (!useCopy.has(index)) continue;
     const hunk = hunks[index]!;
-    lines.splice(hunk.originalStart, hunk.originalLines.length, ...hunk.copyLines);
+    const resolution = resolutions.get(index) ?? "original";
+    if (resolution === "original") continue;
+    const replacement = resolution === "copy"
+      ? hunk.copyLines
+      : [...hunk.originalLines, ...hunk.copyLines];
+    lines.splice(hunk.originalStart, hunk.originalLines.length, ...replacement);
   }
   return lines.join("\n");
 }
